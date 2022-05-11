@@ -12,51 +12,34 @@ from flaskr.db import get_db
 
 bp = Blueprint("blog", __name__)
 
-# TODO: SQL Anfragen anpassen
-
 
 @bp.route("/")
 @login_required
 def index():
     """Show all the posts, most recent first."""
     db = get_db()
-    # gruppen = db.execute(
-    #     "SELECT p.id, title, body, created, author_id, username"
-    #     " FROM post p JOIN user u ON p.author_id = u.id"
-    #     " ORDER BY created DESC"
-    # ).fetchall()
+    users = db.execute(
+        "SELECT U.ID, U.Name, U.TransponderID"
+        " FROM  User U"
+        " ORDER BY U.ID DESC"
+    ).fetchall()
+    gruppen = db.execute(
+        "SELECT G.ID, G.Name"
+        " FROM  Gruppe G"
+        " ORDER BY G.ID DESC"
+    ).fetchall()
 
-    # users = db.execute(
-    #     "SELECT p.id, title, body, created, author_id, username"
-    #     " FROM post p JOIN user u ON p.author_id = u.id"
-    #     " ORDER BY created DESC"
-    # ).fetchall()
-
-    # rechte = db.execute(
-    #     "SELECT p.id, title, body, created, author_id, username"
-    #     " FROM post p JOIN user u ON p.author_id = u.id"
-    #     " ORDER BY created DESC"
-    # ).fetchall()
-
-    # locations = db.execute(
-    #     "SELECT p.id, title, body, created, author_id, username"
-    #     " FROM post p JOIN user u ON p.author_id = u.id"
-    #     " ORDER BY created DESC"
-    # ).fetchall()
-
-    # Check for admin
-
-    # temp
-    gruppen = []
-    rechte = []
-    users = []
-    locations = []
+    locations = db.execute(
+        "SELECT L.ID, L.Name"
+        " FROM  Location L"
+        " ORDER BY L.ID DESC"
+    ).fetchall()
 
     if (g.user is None):
         abort(403)
 
     if(g.user["AdminFlag"] == 1):
-        return render_template("admin/index.html", gruppen=gruppen, users=users, rechte=rechte, locations=locations)
+        return render_template("admin/index.html", gruppen=gruppen, users=users, locations=locations)
     else:
         abort(403)
 
