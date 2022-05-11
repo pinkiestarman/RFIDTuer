@@ -2,46 +2,61 @@
 
 <div class="container">
   <div class="row">
-    <div class="col-md-6">
-      <table>
-        <tr>
-          <th>Nutzername</th>
-          <th>Transponder ID</th>
-        </tr>
+    <div class="col-md-6 p-3">
+      <table class="table table-hover table-light">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nutzername</th>
+            <th scope="col">Transponder ID</th>
+          </tr>
+        </thead>
         {%for user in users%}
         <tr>
+          <th scope="row">{{loop.index}}</th>
           <td>{{user.Name}}</td>
           <td>{{user.TransponderID}}</td>
         </tr>
         {%endfor%}
       </table>
+      <button type="button" class="btn btn-success">Hinzufügen +</button>
     </div>
-
-    <div class="col-md-6">
-      <table>
-        <tr>
-          <th>Gruppenname</th>
-        </tr>
+    <div class="col-md-6 p-3">
+      <table class="table table-hover table-light">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Gruppenname</th>
+          </tr>
+        </thead>
         {%for group in groups%}
         <tr>
+          <th scope="row">{{ loop.index }}</th>
           <td>{{group.Name}}</td>
         </tr>
         {%endfor%}
       </table>
+      <button type="button" class="btn btn-success">Hinzufügen +</button>
     </div>
 
-    <div class="col-md-6">
-      <table>
-        <tr>
-          <th>Locations</th>
-        </tr>
+    <div class="col-md-6 p-3">
+      <table class="table table-hover table-light">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Locations</th>
+          </tr>
+        </thead>
         {%for location in locations%}
         <tr>
+          <th scope="row">{{loop.index}}</th>
           <td>{{location.Name}}</td>
         </tr>
         {%endfor%}
       </table>
+      <button type="button" class="btn btn-success">Hinzufügen +</button>
     </div>
   </div>
 </div>
+
 {% endblock %}
