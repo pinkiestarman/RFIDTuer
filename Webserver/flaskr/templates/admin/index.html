@@ -2,6 +2,8 @@
 
 <div class="container">
   <div class="row">
+
+    <!-- User -->
     <div class="col-md-6 p-3">
       <table class="table table-hover table-light">
         <thead>
@@ -13,14 +15,16 @@
         </thead>
         {%for user in users%}
         <tr>
-          <th scope="row">{{loop.index}}</th>
+          <th scope="row">{{user.ID}}</th>
           <td>{{user.Name}}</td>
           <td>{{user.TransponderID}}</td>
         </tr>
         {%endfor%}
       </table>
-      <button type="button" class="btn btn-success">Hinzufügen +</button>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#UserModal" data-bs-whatever="@mdo">Hinzufügen +</button>
     </div>
+
+    <!-- Gruppen -->
     <div class="col-md-6 p-3">
       <table class="table table-hover table-light">
         <thead>
@@ -29,16 +33,17 @@
             <th scope="col">Gruppenname</th>
           </tr>
         </thead>
-        {%for group in groups%}
+        {%for gruppe in gruppen%}
         <tr>
-          <th scope="row">{{ loop.index }}</th>
-          <td>{{group.Name}}</td>
+          <th scope="row">{{ gruppe.ID }}</th>
+          <td>{{gruppe.Name}}</td>
         </tr>
         {%endfor%}
       </table>
-      <button type="button" class="btn btn-success">Hinzufügen +</button>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#GruppeModal" data-bs-whatever="@mdo">Hinzufügen +</button>
     </div>
 
+    <!-- location -->
     <div class="col-md-6 p-3">
       <table class="table table-hover table-light">
         <thead>
@@ -49,35 +54,89 @@
         </thead>
         {%for location in locations%}
         <tr>
-          <th scope="row">{{loop.index}}</th>
+          <th scope="row">{{location.ID}}</th>
           <td>{{location.Name}}</td>
         </tr>
         {%endfor%}
       </table>
-      <button type="button" class="btn btn-success">Hinzufügen +</button>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#LocationModal" data-bs-whatever="@mdo">Hinzufügen +</button>
     </div>
   </div>
 </div>
 
-
-<!-- Button trigger modal -->
-<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-  Launch demo modal
-</button>
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Modal User-->
+<div class="modal fade" id="UserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="exampleModalLabel">User</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        ...
+        <form action="{{ url_for('rfid.user_create') }}" method="POST">
+          <div class="mb-3">
+            <label for="user-name" class="col-form-label">Name:</label>
+            <input type="text" class="form-control" id="user-name" name="user-name">
+          </div>
+          <div class="mb-3">
+            <label for="user-TransponderID" class="col-form-label">Trasnponder ID:</label>
+            <input type="text" class="form-control" id="user-TransponderID" name="user-TransponderID"></input>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+          <button type="submit" class="btn btn-primary">Speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Location-->
+<div class="modal fade" id="LocationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Location</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+      <div class="modal-body">
+        <form action="{{ url_for('rfid.location_create') }}" method="POST">
+          <div class="mb-3">
+            <label for="location-name" class="col-form-label">Name:</label>
+            <input type="text" class="form-control" id="location-name" name="location-name">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+          <button type="submit" class="btn btn-primary">Speichern</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Gruppe-->
+<div class="modal fade" id="GruppeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Gruppe</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('rfid.gruppe_create') }}" method="POST">
+          <div class="mb-3">
+            <label for="gruppe-name" class="col-form-label">Gruppe:</label>
+            <input type="text" class="form-control" id="gruppe-name" name="gruppe-name">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+          <button type="submit" class="btn btn-primary">Speichern</button>
+        </div>
+      </form>
       </div>
     </div>
   </div>

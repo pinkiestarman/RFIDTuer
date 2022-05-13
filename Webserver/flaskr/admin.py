@@ -10,7 +10,7 @@ from werkzeug.exceptions import abort
 from flaskr.auth import login_required
 from flaskr.db import get_db
 
-bp = Blueprint("blog", __name__)
+bp = Blueprint("admin", __name__)
 
 
 @bp.route("/")
@@ -21,18 +21,18 @@ def index():
     users = db.execute(
         "SELECT U.ID, U.Name, U.TransponderID"
         " FROM  User U"
-        " ORDER BY U.ID DESC"
+        " ORDER BY U.ID ASC"
     ).fetchall()
     gruppen = db.execute(
         "SELECT G.ID, G.Name"
         " FROM  Gruppe G"
-        " ORDER BY G.ID DESC"
+        " ORDER BY G.ID ASC"
     ).fetchall()
 
     locations = db.execute(
         "SELECT L.ID, L.Name"
         " FROM  Location L"
-        " ORDER BY L.ID DESC"
+        " ORDER BY L.ID ASC"
     ).fetchall()
 
     if (g.user is None):
