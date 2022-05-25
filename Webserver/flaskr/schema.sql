@@ -142,3 +142,28 @@ VALUES
         'pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254',
         1
     );
+
+INSERT INTO
+    user(Name, Passwort_hash, AdminFlag, TransponderID)
+VALUES
+    (
+        'Doorian',
+        'pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254',
+        0,
+        111111111111111
+    );
+
+INSERT INTO Gruppe (Name) VALUES ('Lehrer',);
+
+INSERT INTO Location (Name) VALUES ('Door');
+
+INSERT INTO Location (Name, Parent_ID) VALUES ('Room',1);
+
+INSERT INTO
+    logs (User_ID, Objekt_ID, Desription)
+VALUES
+    (
+        2,
+        1,
+        'Doorian schreitete heroisch durch die Tür'
+    );

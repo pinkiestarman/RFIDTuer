@@ -50,7 +50,7 @@ def gruppe_create():
         db = get_db()
         if(db.execute('SELECT Name FROM Location WHERE Name=?', (gruppe,)).fetchone() == None):
             db.execute(
-                'INSERT OR IGNORE INTO Gruppe (Name) VALUES (?)', (gruppe,))
+                'INSERT INTO Gruppe (Name) VALUES (?)', (gruppe,))
             db.commit()
         else:
             flash("Name der Gruppe existiert bereits")

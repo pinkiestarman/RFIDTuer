@@ -82,6 +82,41 @@
             <label for="user-TransponderID" class="col-form-label">Trasnponder ID:</label>
             <input type="text" class="form-control" id="user-TransponderID" name="user-TransponderID"></input>
           </div>
+          <div class="mb-3">
+            <table class="table table-hover table-light" id="GruppeZuordnungTable">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Gruppenname</th>
+                </tr>
+              </thead>
+              <tbody>
+              {%for gruppe in gruppen%}
+              <tr>
+                <th scope="row">{{ gruppe.ID }}</th>
+                <td>{{gruppe.Name}}</td>
+              </tr>
+              {%endfor%}
+            </tbody>
+            </table>
+            <script type="text/javascript">
+              $('#GruppeZuordnungTable tbody tr').click(function() {
+                  if($(this).attr('class')=="table-primary") {
+                    $(this).removeClass('table-primary');
+                    
+                  } else {
+                    $(this).addClass('table-primary');
+                    console.log($(this).attr('class'));
+                    var input = document.createElement("input");
+                    input.id = $(this).first().text()
+                    input.type="hidden"
+                    console.log(input.id)
+                    input.name=""
+                  }
+
+              });
+            </script>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
