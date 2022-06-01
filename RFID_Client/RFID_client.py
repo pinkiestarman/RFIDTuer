@@ -98,17 +98,21 @@ class db():
 
     def connect(self):
         try:
-            self.conn = mariadb.connect(
-                user="door",
-                password="key",
-                host="192.168.0.24",
-                port=3306,
-                database="RFID"
-            )
+            self.conn.ping()
             return 0
-        except mariadb.Error as e:
-            print(f"Error connecting to MariaDB Platform: {e}")
-            return 1
+        except:
+            try:
+                self.conn = mariadb.connect(
+                    user="door",
+                    password="key",
+                    host="10.130.0.41",
+                    port=3306,
+                    database="RFID"
+                )
+                return 0
+            except mariadb.Error as e:
+                print(f"Error connecting to MariaDB Platform: {e}")
+                return 1
 
     def check_acces_right(self, id):
         try:
@@ -144,35 +148,39 @@ def main():
     while(True):
         # Init
         acces_granted = False
-
+        id, text = reader.read()
         try:
-            print('Connect to Database...')
-            while(database.connect() != 0):
+            print('Check connection to database...')
+            if(database.connect() != 0):
                 print('Database connection failed, retry in 10 sec')
                 led.blinkin(led.red())
                 time.sleep(10)
             else:
-                print('Database Connection succesfull!')
+                print('Database connection established!')
             # Read RFID Chip
             id, text = reader.read()
 
             # Check special flags
             flag = database.check_special_flag(id)
 
-            # Check Access
-            if(acces_granted != True):
-                acces_granted = database.check_acces_right(id)
+            if(flag is not None):
+                if(flag == 1):
+                    led.yellow()
+                else:
+                    # Check Access
+                    if(acces_granted != True):
+                        acces_granted = database.check_acces_right(id)
 
-            if (acces_granted):
-                print('Acces Granted!')
-                led.green()
+                    if (acces_granted):
+                        print('Acces Granted!')
+                        led.green()
+                    else:
+                        print('Acces Denied!')
+                        led.red()
             else:
-                print('Acces Denied!')
-                led.red()
-
-            # sleep
-            time.sleep(3)
+                print('Data spaghetti')
         finally:
+            time.sleep(3)
             led.blue()
 
 
