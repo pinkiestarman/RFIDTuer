@@ -2,108 +2,115 @@
 
 -- Drop any existing data and create empty tables.
 
-DROP TABLE IF EXISTS User;
+DROP TABLE IF EXISTS user;
 
-DROP TABLE IF EXISTS Gruppe;
+DROP TABLE IF EXISTS gruppe;
 
-DROP TABLE IF EXISTS Gruppe_Recht;
+DROP TABLE IF EXISTS gruppe_recht;
 
-DROP TABLE IF EXISTS Location;
+DROP TABLE IF EXISTS location;
 
-DROP TABLE IF EXISTS Logs;
+DROP TABLE IF EXISTS logs;
 
-DROP TABLE IF EXISTS Recht;
+DROP TABLE IF EXISTS recht;
 
-DROP TABLE IF EXISTS User_Gruppe;
+DROP TABLE IF EXISTS user_gruppe;
 
-DROP TABLE IF EXISTS User_Recht;
+DROP TABLE IF EXISTS user_recht;
 
 -- --------------------------------------------------------
 
 --
 
--- Tabellenstruktur für Tabelle `Gruppe`
+-- Tabellenstruktur für Tabelle `gruppe`
 
 --
 
-CREATE TABLE `Gruppe` (
-    `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `Name` TEXT NOT NULL UNIQUE
+CREATE TABLE `gruppe` (
+    id INT NOT NULL AUTO_INCREMENT,
+    `name` TEXT(70),
+    PRIMARY KEY(id)
 );
 
 -- --------------------------------------------------------
 
 --
 
--- Tabellenstruktur für Tabelle `Gruppe_Recht`
+-- Tabellenstruktur für Tabelle `gruppe_recht`
 
 --
 
-CREATE TABLE `Gruppe_Recht` (
-    `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `Gruppe_ID` INTEGER NOT NULL,
-    `Recht_ID` INTEGER NOT NULL
+CREATE TABLE `gruppe_recht` (
+    id INT NOT NULL AUTO_INCREMENT,
+    `gruppe_id` INT NOT NULL,
+    `recht_id` INT NOT NULL,
+    PRIMARY KEY(id)
 );
 
 -- --------------------------------------------------------
 
 --
 
--- Tabellenstruktur für Tabelle `Location`
+-- Tabellenstruktur für Tabelle `location`
 
 --
 
-CREATE TABLE `Location` (
-    `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `Parent_ID` INTEGER,
-    `Name` TEXT NOT NULL
+CREATE TABLE `location` (
+    id INT NOT NULL AUTO_INCREMENT,
+    `parent_id` INT,
+    `name` TEXT,
+    `client_id` INT,
+    PRIMARY KEY(id)
 );
 
 -- --------------------------------------------------------
 
 --
 
--- Tabellenstruktur für Tabelle `Logs`
+-- Tabellenstruktur für Tabelle `logs`
 
 --
 
-CREATE TABLE `Logs` (
-    `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    `User_ID` INTEGER NOT NULL,
-    `Objekt_ID` INTEGER NOT NULL,
-    `Description` TEXT NOT NULL
+CREATE TABLE `logs` (
+    id INT NOT NULL AUTO_INCREMENT,
+    `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `user_id` INT NOT NULL,
+    `objekt_id` INT NOT NULL,
+    `description` TEXT NOT NULL,
+    PRIMARY KEY (id)
 );
 
 -- --------------------------------------------------------
 
 --
 
--- Tabellenstruktur für Tabelle `Recht`
+-- Tabellenstruktur für Tabelle `recht`
 
 --
 
-CREATE TABLE `Recht` (
-    `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `Zeit_von` time NOT NULL,
-    `Zeit_bis` time NOT NULL,
-    `Objekt_ID` INTEGER NOT NULL
+CREATE TABLE `recht` (
+    id INT NOT NULL AUTO_INCREMENT,
+    `zeit_von` time,
+    `zeit_bis` time,
+    `objekt_id` INT NOT NULL,
+    PRIMARY KEY(id)
 );
 
 -- --------------------------------------------------------
 
 --
 
--- Tabellenstruktur für Tabelle `User`
+-- Tabellenstruktur für Tabelle `user`
 
 --
 
-CREATE TABLE `User` (
-    `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `Name` TEXT UNIQUE NOT NULL,
-    `TransponderID` INTEGER,
-    `Passwort_hash` TEXT NOT NULL,
-    `AdminFlag` BOOLEAN DEFAULT 0
+CREATE TABLE `user` (
+    id INT NOT NULL AUTO_INCREMENT,
+    `name` TEXT(70) NOT NULL,
+    `transponder_id` BIGINT,
+    `passwort_hash` TEXT NOT NULL,
+    `admin_flag` BOOLEAN DEFAULT 0,
+    PRIMARY KEY(id)
 );
 
 -- --------------------------------------------------------
@@ -114,10 +121,11 @@ CREATE TABLE `User` (
 
 --
 
-CREATE TABLE `User_Gruppe` (
-    `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `User_ID` INTEGER NOT NULL,
-    `Gruppe_ID` INTEGER NOT NULL
+CREATE TABLE `user_gruppe` (
+    id INT NOT NULL AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `gruppe_id` INT NOT NULL,
+    PRIMARY KEY(id)
 );
 
 -- --------------------------------------------------------
@@ -128,14 +136,57 @@ CREATE TABLE `User_Gruppe` (
 
 --
 
-CREATE TABLE `User_Recht` (
-    `ID` INTEGER PRIMARY KEY AUTOINCREMENT,
-    `User_ID` INTEGER NOT NULL,
-    `Recht_ID` INTEGER NOT NULL
+CREATE TABLE `user_recht` (
+    id INT NOT NULL AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `recht_id` INT NOT NULL,
+    PRIMARY KEY(id)
 );
 
+-- User ------------------------------------------
+
+--Admin
+
+DROP USER 'admin'@'%';
+
+FLUSH PRIVILEGES;
+
+CREATE USER 'admin'@'%' IDENTIFIED BY 'admin';
+
+GRANT ALL PRIVILEGES ON RFID.* TO 'admin'@'%';
+
+--Türen
+
+DROP USER 'door'@'%';
+
+FLUSH PRIVILEGES;
+
+GRANT SELECT ON RFID.* TO 'door'@'%' IDENTIFIED BY 'key';
+
+GRANT INSERT ON RFID.logs TO 'door'@'%';
+
+GRANT INSERT ON RFID.user TO 'door'@'%';
+
+--Verwalter
+
+DROP USER 'Verwalter' @'%';
+
+FLUSH PRIVILEGES;
+
+GRANT
+SELECT,
+INSERT,
+UPDATE
+    ON RFID.* TO 'Verwalter' @'%' IDENTIFIED BY '123';
+
+FLUSH PRIVILEGES;
+
+-- Some Testdata ---------------------------------
+
+-- User ----------------------
+
 INSERT INTO
-    user (Name, Passwort_hash, AdminFlag)
+    user (name, passwort_hash, admin_flag)
 VALUES
     (
         'admin',
@@ -144,23 +195,66 @@ VALUES
     );
 
 INSERT INTO
-    user(Name, Passwort_hash, AdminFlag, TransponderID)
+    user(name, passwort_hash, admin_flag, transponder_id)
 VALUES
     (
-        'Doorian',
+        'Doorian (Chip Standard User)',
         'pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254',
         0,
-        111111111111111
+        882784646626
     );
 
-INSERT INTO Gruppe (Name) VALUES ('Lehrer',);
+INSERT INTO
+    user(name, passwort_hash, admin_flag, transponder_id)
+VALUES
+    (
+        'CREATE NEW USER (Card)',
+        'pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254',
+        0,
+        1050655679228
+    );
 
-INSERT INTO Location (Name) VALUES ('Door');
+-- gruppe ----------------------
 
-INSERT INTO Location (Name, Parent_ID) VALUES ('Room',1);
+INSERT INTO gruppe (name) VALUES ('Lehrer');
+
+-- location ----------------------
 
 INSERT INTO
-    logs (User_ID, Objekt_ID, Desription)
+    location (Name, parent_id)
+VALUES
+    ('Lehrerzimmer ID 1', 5);
+
+INSERT INTO
+    location (name, parent_id, client_id)
+VALUES
+    ('Tür ID 2', 1, 1);
+
+INSERT INTO location (name, parent_id) VALUES ('Küche ID 3', 5);
+
+INSERT INTO
+    location (name, parent_id, client_id)
+VALUES
+    ('Tür ID 3', 3, 2);
+
+INSERT INTO location (Name) VALUES ('Schulgebäude ID 5');
+
+-- user_gruppe ----------------------
+
+INSERT INTO user_gruppe (gruppe_id, user_id) VALUES (1,2);
+
+-- recht ----------------------
+
+INSERT INTO recht (objekt_id) VALUES (2);
+
+-- gruppe_recht ----------------------
+
+INSERT INTO gruppe_recht (gruppe_id, recht_id) VALUES (1,1);
+
+-- logs ----------------------
+
+INSERT INTO
+    logs (user_id, objekt_id, description)
 VALUES
     (
         2,

@@ -15,9 +15,9 @@
         </thead>
         {%for user in users%}
         <tr>
-          <th scope="row">{{user.ID}}</th>
-          <td>{{user.Name}}</td>
-          <td>{{user.TransponderID}}</td>
+          <th scope="row">{{user.id}}</th>
+          <td>{{user.name}}</td>
+          <td>{{user.transponder_id}}</td>
         </tr>
         {%endfor%}
       </table>
@@ -35,8 +35,8 @@
         </thead>
         {%for gruppe in gruppen%}
         <tr>
-          <th scope="row">{{ gruppe.ID }}</th>
-          <td>{{gruppe.Name}}</td>
+          <th scope="row">{{ gruppe.id }}</th>
+          <td>{{gruppe.name}}</td>
         </tr>
         {%endfor%}
       </table>
@@ -54,8 +54,8 @@
         </thead>
         {%for location in locations%}
         <tr>
-          <th scope="row">{{location.ID}}</th>
-          <td>{{location.Name}}</td>
+          <th scope="row">{{location.id}}</th>
+          <td>{{location.name}}</td>
         </tr>
         {%endfor%}
       </table>

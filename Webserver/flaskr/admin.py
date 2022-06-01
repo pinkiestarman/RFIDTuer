@@ -8,7 +8,7 @@ from flask import url_for
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
-from flaskr.db import get_db
+from flaskr.db import cursor_to_dict_array, get_cursor, get_db
 
 bp = Blueprint("admin", __name__)
 
@@ -17,89 +17,37 @@ bp = Blueprint("admin", __name__)
 @login_required
 def index():
     """Show all the posts, most recent first."""
-    db = get_db()
-    users = db.execute(
-        "SELECT U.ID, U.Name, U.TransponderID"
-        " FROM  User U"
-        " ORDER BY U.ID ASC"
-    ).fetchall()
-    gruppen = db.execute(
-        "SELECT G.ID, G.Name"
-        " FROM  Gruppe G"
-        " ORDER BY G.ID ASC"
-    ).fetchall()
+    cur = get_cursor()
+    cur.execute(
+        "SELECT u.id, u.name, u.transponder_id"
+        " FROM  user u"
+        " ORDER BY u.id ASC"
+    )
+    users = cursor_to_dict_array(cur)
 
-    locations = db.execute(
-        "SELECT L.ID, L.Name"
-        " FROM  Location L"
-        " ORDER BY L.ID ASC"
-    ).fetchall()
+    cur.execute(
+        "SELECT g.id, g.name"
+        " FROM  gruppe g"
+        " ORDER BY g.id ASC"
+    )
+    gruppen = cursor_to_dict_array(cur)
+
+    cur.execute(
+        "SELECT l.id, l.name"
+        " FROM  location l"
+        " ORDER BY l.id ASC"
+    )
+    locations = cursor_to_dict_array(cur)
+
+    cur.close()
 
     if (g.user is None):
         abort(403)
 
-    if(g.user["AdminFlag"] == 1):
+    if(g.user["admin_flag"] == 1):
         return render_template("admin/index.html", gruppen=gruppen, users=users, locations=locations)
     else:
         abort(403)
-
-
-def get_post(id, check_author=True):
-    """Get a post and its author by id.
-
-    Checks that the id exists and optionally that the current user is
-    the author.
-
-    :param id: id of post to get
-    :param check_author: require the current user to be the author
-    :return: the post with author information
-    :raise 404: if a post with the given id doesn't exist
-    :raise 403: if the current user isn't the author
-    """
-    post = (
-        get_db()
-        .execute(
-            "SELECT p.id, title, body, created, author_id, username"
-            " FROM post p JOIN user u ON p.author_id = u.id"
-            " WHERE p.id = ?",
-            (id,),
-        )
-        .fetchone()
-    )
-
-    if post is None:
-        abort(404, f"Post id {id} doesn't exist.")
-
-    if check_author and post["author_id"] != g.user["id"]:
-        abort(403)
-
-    return post
-
-
-@bp.route("/create", methods=("GET", "POST"))
-@login_required
-def create():
-    """Create a new post for the current user."""
-    if request.method == "POST":
-        title = request.form["title"]
-        body = request.form["body"]
-        error = None
-
-        if not title:
-            error = "Title is required."
-
-        if error is not None:
-            flash(error)
-        else:
-            db = get_db()
-            db.execute(
-                "INSERT INTO post (title, body, author_id) VALUES (?, ?, ?)",
-                (title, body, g.user["id"]),
-            )
-            db.commit()
-            return redirect(url_for("blog.index"))
-
-    return render_template("blog/create.html")
 
 
 @bp.route("/<int:id>/update", methods=("GET", "POST"))

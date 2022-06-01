@@ -1,4 +1,5 @@
 import functools
+from webbrowser import get
 
 from flask import Blueprint
 from flask import flash
@@ -11,7 +12,7 @@ from flask import url_for
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 
-from flaskr.db import get_db
+from flaskr.db import cursor_to_dict_array, get_cursor, get_db
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
 
@@ -38,9 +39,10 @@ def load_logged_in_user():
     if user_id is None:
         g.user = None
     else:
-        g.user = (
-            get_db().execute("SELECT * FROM User WHERE ID = ?", (user_id,)).fetchone()
-        )
+        cur = get_cursor()
+        cur.execute("SELECT * FROM user WHERE ID = ?", (user_id,))
+        array = cursor_to_dict_array(cur)
+        g.user = array[0]
 
 
 @bp.route("/register", methods=("GET", "POST"))
@@ -87,20 +89,27 @@ def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
-        db = get_db()
         error = None
-        user = db.execute(
-            "SELECT * FROM User WHERE Name = ?", (username,)
-        ).fetchone()
+        db = get_db()
+        cur = db.cursor()
+        cur.execute(
+            "SELECT * FROM user WHERE name = ?", (username,)
+        )
+        users = cursor_to_dict_array(cur)
+        if(len(users) > 0):
+            user = users[0]
+        else:
+            user = None
+        cur.close()
         if user is None:
-            error = "Incorrect username."
-        elif not check_password_hash(user["Passwort_hash"], password):
-            error = "Incorrect password."
+            error = "Incorrect username/password."
+        elif not check_password_hash(user["passwort_hash"], password):
+            error = "Incorrect username/password."
 
         if error is None:
             # store the user id in a new session and return to the index
             session.clear()
-            session["user_id"] = user["ID"]
+            session["user_id"] = user["id"]
             return redirect(url_for("index"))
 
         flash(error)

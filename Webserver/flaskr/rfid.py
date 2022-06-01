@@ -10,7 +10,7 @@ from flask import url_for
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
-from flaskr.db import get_db
+from flaskr.db import db_commit, get_cursor, get_db
 
 bp = Blueprint('rfid', __name__)
 
@@ -21,13 +21,13 @@ def user_create():
     if 'user-name' in request.form and 'user-TransponderID' in request.form:
         username = request.form['user-name']
         transponderID = request.form['user-TransponderID']
-        db = get_db()
-        db.execute(
-            'INSERT INTO user (Name, TransponderID, Passwort_hash) VALUES (?, ?, ?)',
+        cur = get_cursor()
+        cur.execute(
+            'INSERT INTO user (name, transponder_id, passwort_hash) VALUES (?, ?, ?)',
             (username, transponderID,
              'pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254',),
         )
-        db.commit()
+        db_commit()
     return redirect(url_for('admin.index'))
 
 
@@ -36,9 +36,9 @@ def user_create():
 def location_create():
     if 'location-name' in request.form:
         location = request.form['location-name']
-        db = get_db()
-        db.execute('INSERT INTO Location (Name) VALUES (?)', (location,))
-        db.commit()
+        cur = get_cursor()
+        cur.execute('INSERT INTO location (name) VALUES (?)', (location,))
+        db_commit()
     return redirect(url_for('admin.index'))
 
 
@@ -47,11 +47,12 @@ def location_create():
 def gruppe_create():
     if 'gruppe-name' in request.form:
         gruppe = request.form['gruppe-name']
-        db = get_db()
-        if(db.execute('SELECT Name FROM Location WHERE Name=?', (gruppe,)).fetchone() == None):
-            db.execute(
-                'INSERT INTO Gruppe (Name) VALUES (?)', (gruppe,))
-            db.commit()
+        cur = get_cursor()
+        cur.execute('SELECT name FROM location WHERE name=?', (gruppe,))
+        if(cur.fetchone() == None):
+            cur.execute(
+                'INSERT INTO gruppe (name) VALUES (?)', (gruppe,))
+            db_commit()
         else:
             flash("Name der Gruppe existiert bereits")
     return redirect(url_for('admin.index'))

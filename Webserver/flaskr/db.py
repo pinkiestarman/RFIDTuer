@@ -1,4 +1,5 @@
-import sqlite3
+from multiprocessing import Value
+import mariadb
 
 import click
 from flask import current_app
@@ -12,11 +13,13 @@ def get_db():
     again.
     """
     if "db" not in g:
-        g.db = sqlite3.connect(
-            current_app.config["DATABASE"], detect_types=sqlite3.PARSE_DECLTYPES
+        g.db = mariadb.connect(
+            user='admin',
+            password='admin',
+            host='192.168.0.87',
+            port=3306,
+            database='RFID'
         )
-        g.db.row_factory = sqlite3.Row
-
     return g.db
 
 
@@ -30,12 +33,30 @@ def close_db(e=None):
         db.close()
 
 
+def get_cursor():
+    db = get_db()
+    cur = db.cursor()
+    return(cur)
+
+
+def db_commit():
+    db = get_db()
+    db.commit()
+
+
+def cursor_to_dict_array(cur):
+    res = [dict((cur.description[i][0], value)
+                for i, value in enumerate(row)) for row in cur.fetchall()]
+    return res
+
+
 def init_db():
     """Clear existing data and create new tables."""
-    db = get_db()
+    print('not functional!')
+    #db = get_db()
 
-    with current_app.open_resource("schema.sql") as f:
-        db.executescript(f.read().decode("utf8"))
+    # with current_app.open_resource("schema.sql") as f:
+    #     db.executescript(f.read().decode("utf8"))
 
 
 @click.command("init-db")
