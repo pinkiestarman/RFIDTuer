@@ -107,9 +107,10 @@ CREATE TABLE `recht` (
 CREATE TABLE `user` (
     id INT NOT NULL AUTO_INCREMENT,
     `name` TEXT(70) NOT NULL,
-    `transponder_id` BIGINT,
+    `transponder_id` BIGINT UNIQUE,
     `passwort_hash` TEXT NOT NULL,
     `admin_flag` BOOLEAN DEFAULT 0,
+    `management_code` INT DEFAULT 0,
     PRIMARY KEY(id)
 );
 
@@ -167,6 +168,14 @@ GRANT INSERT ON RFID.logs TO 'door'@'%';
 
 GRANT INSERT ON RFID.user TO 'door'@'%';
 
+GRANT INSERT ON RFID.gruppe TO 'door'@'%';
+
+GRANT INSERT ON RFID.user_gruppe TO 'door'@'%';
+
+GRANT INSERT ON RFID.recht TO 'door'@'%';
+
+GRANT INSERT ON RFID.gruppe_recht TO 'door'@'%';
+
 --Verwalter
 
 DROP USER 'Verwalter' @'%';
@@ -205,18 +214,48 @@ VALUES
     );
 
 INSERT INTO
-    user(name, passwort_hash, admin_flag, transponder_id)
+    user(
+        name,
+        passwort_hash,
+        admin_flag,
+        transponder_id,
+        management_code
+    )
 VALUES
     (
         'CREATE NEW USER (Card)',
         'pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254',
         0,
-        1050655679228
+        1050655679228,
+        1
+    );
+
+INSERT INTO
+    user(
+        name,
+        passwort_hash,
+        admin_flag,
+        transponder_id,
+        management_code
+    )
+VALUES
+    (
+        'CREATE NEW USER (Card)',
+        'pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254',
+        0,
+        706167923279,
+        2
     );
 
 -- gruppe ----------------------
 
 INSERT INTO gruppe (name) VALUES ('Lehrer');
+
+INSERT INTO gruppe (name) VALUES ('admin');
+
+INSERT INTO gruppe (name) VALUES ('CREATE NEW USER (Card)');
+
+INSERT INTO gruppe (name) VALUES ('Doorian (Chip Standard User)');
 
 -- location ----------------------
 
@@ -242,6 +281,12 @@ INSERT INTO location (Name) VALUES ('Schulgebäude ID 5');
 -- user_gruppe ----------------------
 
 INSERT INTO user_gruppe (gruppe_id, user_id) VALUES (1,2);
+
+INSERT INTO user_gruppe (gruppe_id, user_id) VALUES (2,1);
+
+INSERT INTO user_gruppe (gruppe_id, user_id) VALUES (3,2);
+
+INSERT INTO user_gruppe (gruppe_id, user_id) VALUES (4,3);
 
 -- recht ----------------------
 
