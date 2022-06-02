@@ -106,7 +106,7 @@ class db():
                 self.conn = mariadb.connect(
                     user="door",
                     password="key",
-                    host="10.130.0.41",
+                    host="127.0.0.1",
                     port=3306,
                     database="RFID"
                 )

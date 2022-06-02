@@ -178,7 +178,7 @@ GRANT INSERT ON RFID.gruppe_recht TO 'door'@'%';
 
 --Verwalter
 
-DROP USER 'Verwalter' @'%';
+DROP USER 'verwalter' @'%';
 
 FLUSH PRIVILEGES;
 
@@ -186,7 +186,7 @@ GRANT
 SELECT,
 INSERT,
 UPDATE
-    ON RFID.* TO 'Verwalter' @'%' IDENTIFIED BY '123';
+    ON RFID.* TO 'verwalter' @'%' IDENTIFIED BY '123';
 
 FLUSH PRIVILEGES;
 
