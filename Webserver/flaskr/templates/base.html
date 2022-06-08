@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <title>{% block title %}{% endblock %} - RFID Access</title>
 <!-- CSS only -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link
   href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
   rel="stylesheet"
@@ -12,13 +13,19 @@
 <body class="bg-dark">
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <a class="navbar-brand" href="{{ url_for('index') }}">RFID Access</a>
-    <div
-      class="collapse navbar-collapse justify-content-end"
-      id="navbarSupportedContent"
-    >
-      <ul class="navbar-nav mr-auto">
+    
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item ">
+        <a class="nav-link" href="/user">Nutzer</a>
+      </li>
+      <li class="nav-item ">
+        <a class="nav-link" href="/gruppe">Gruppen</a>
+      </li>
+      <li class="nav-item ">
+        <a class="nav-link" href="/location">Orte</a>
+      </li>
         {% if g.user %}
-        <span class="navbar-text">{{ g.user['Name'] }}</span>
+        <span class="navbar-text" style="margin-left: auto">{{ g.user['name'] }}</span>
         {% endif %} {% if g.user %}
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('auth.logout') }}">Log Out</a>
@@ -28,8 +35,7 @@
           <a class="nav-link" href="{{ url_for('auth.login') }}">Log In</a>
         </li>
         {% endif %}
-      </ul>
-    </div>
+    </ul>
   </nav>
   {% with messages = get_flashed_messages() %}
   {% if messages %}

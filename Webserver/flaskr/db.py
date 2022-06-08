@@ -16,7 +16,7 @@ def get_db():
         g.db = mariadb.connect(
             user='admin',
             password='admin',
-            host='192.168.0.87',
+            host='127.0.0.1',
             port=3306,
             database='RFID'
         )

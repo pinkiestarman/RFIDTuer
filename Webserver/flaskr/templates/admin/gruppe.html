@@ -1,0 +1,59 @@
+{% extends 'base.html' %} {% block content %}
+
+<h4 class="text-light">Gruppen</h4>
+<table class="table table-hover table-light" id="gruppe_table">
+  <thead>
+    <tr>
+      <th scope="col" style="display:none">ID</th>
+      <th scope="col">Gruppenname</th>
+      <th scope="col"></th>
+    </tr>
+  </thead>
+  {%for gruppe in gruppen%}
+  <tr>
+    <th scope="row" style="display:none">{{ gruppe.id }}</th>
+    {% if gruppe.user_id %}
+    <td style="color:green">{{gruppe.name}}</td>
+    {%else%}
+    <td>{{gruppe.name}}</td>
+    {%endif%}
+    <td>
+        <a href="{{['/gruppe', gruppe.id,'delete']|join('/')}}" class="delete" data-toggle="modal"><i class="fa fa-trash-o" data-toggle="tooltip" title="Delete"></i></a>
+    </td>
+  </tr>
+  {%endfor%}
+</table>
+<script>
+    $('#gruppe_table').on('click', 'tbody td', function () {
+        var $row = $(this).closest('tr'),
+        $th = $row.find('th');
+        window.location.href = '/gruppe/'+$th.text()
+    });
+</script>
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#GruppeModal" data-bs-whatever="@mdo">Hinzufügen +</button>
+
+<!-- Modal Gruppe-->
+<div class="modal fade" id="GruppeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Gruppe</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{{ url_for('admin.gruppe_create') }}" method="POST">
+            <div class="mb-3">
+              <label for="gruppe-name" class="col-form-label">Gruppe:</label>
+              <input type="text" class="form-control" id="gruppe-name" name="gruppe-name">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+            <button type="submit" class="btn btn-primary">Speichern</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

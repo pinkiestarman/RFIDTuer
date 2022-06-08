@@ -5,17 +5,18 @@
 
     <!-- User -->
     <div class="col-md-6 p-3">
+      <h4 class="text-light">Nutzer</h4>
       <table class="table table-hover table-light">
         <thead>
           <tr>
-            <th scope="col">ID</th>
+            <th scope="col" style="display:none">ID</th>
             <th scope="col">Nutzername</th>
             <th scope="col">Transponder ID</th>
           </tr>
         </thead>
         {%for user in users%}
         <tr>
-          <th scope="row">{{user.id}}</th>
+          <th scope="row" style="display:none">{{user.id}}</th>
           <td>{{user.name}}</td>
           <td>{{user.transponder_id}}</td>
         </tr>
@@ -26,6 +27,7 @@
 
     <!-- Gruppen -->
     <div class="col-md-6 p-3">
+      <h4 class="text-light">Gruppen</h4>
       <table class="table table-hover table-light">
         <thead>
           <tr>
@@ -45,6 +47,7 @@
 
     <!-- location -->
     <div class="col-md-6 p-3">
+      <h4 class="text-light">Orte</h4>
       <table class="table table-hover table-light">
         <thead>
           <tr>
@@ -61,6 +64,32 @@
       </table>
       <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#LocationModal" data-bs-whatever="@mdo">Hinzufügen +</button>
     </div>
+
+
+    <!-- recht -->
+    <div class="col-md-6 p-3">
+      <h4 class="text-light">Rechte</h4>
+      <table class="table table-hover table-light">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Recht auf</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        {%for recht in rechte%}
+        <tr>
+          <th scope="row">{{ recht.id }}</th>
+          <td>{{recht.location_name}}</td>
+          <td>
+            <a href="#deleteModal" class="delete" data-toggle="modal"><i class="fa fa-trash-o" data-toggle="tooltip" title="Delete"></i></a>
+          </td>
+        </tr>
+        {%endfor%}
+      </table>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#GruppeModal" data-bs-whatever="@mdo">Hinzufügen +</button>
+    </div>
+
   </div>
 </div>
 
@@ -93,8 +122,8 @@
               <tbody>
               {%for gruppe in gruppen%}
               <tr>
-                <th scope="row">{{ gruppe.ID }}</th>
-                <td>{{gruppe.Name}}</td>
+                <th scope="row">{{ gruppe.id }}</th>
+                <td>{{gruppe.name}}</td>
               </tr>
               {%endfor%}
             </tbody>
@@ -136,7 +165,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="{{ url_for('rfid.location_create') }}" method="POST">
+        <form action="{{ url_for('admin.location_create') }}" method="POST">
           <div class="mb-3">
             <label for="location-name" class="col-form-label">Name:</label>
             <input type="text" class="form-control" id="location-name" name="location-name">
@@ -158,6 +187,30 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Gruppe</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('rfid.gruppe_create') }}" method="POST">
+          <div class="mb-3">
+            <label for="gruppe-name" class="col-form-label">Gruppe:</label>
+            <input type="text" class="form-control" id="gruppe-name" name="gruppe-name">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+          <button type="submit" class="btn btn-primary">Speichern</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Sind sie sich sicher?</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">

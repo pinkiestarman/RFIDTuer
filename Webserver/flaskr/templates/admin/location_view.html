@@ -1,0 +1,58 @@
+{% extends 'base.html' %} {% block content %}
+
+
+  <h4 class="text-light">{{location.name}}</h4>
+  <div class="container">
+    <div class="row">
+    <!--Nutzerdaten-->
+      <div class="col p-3">
+        <h4 class="text-light">Ortsdaten:</h4>
+        <form action="{{ url_for('admin.location_create') }}" method="POST">
+            <input type="text" class="form-control" id="user-id" name="user-id" style="display:none" value="{{location.id}}"></input>
+            <label for="user-name" class="col-form-label text-white">Name:</label>
+            <input type="text" class="form-control" id="user-name" name="user-name" value="{{location.name}}">
+            <button type="submit" class="btn btn-primary mt-2">Updaten</button>
+        </form>
+      </div>
+
+    <!--Childs-->
+    <div class="col-md-4 p-3">
+      <h4 class="text-light"></h4>
+      <table class="table table-hover table-light" id='table_gruppen_user'>
+        {%for user in users%}
+        <tr>
+          <th scope="row" style="display:none">{{ user.id }}</th>
+          <td>{{user.name}}</td>
+        </tr>
+        {%endfor%}
+      </table>
+      <script>
+        $('#table_gruppen_user').on('click', 'tbody td', function () {
+            var $row = $(this).closest('tr'),
+            $th = $row.find('th');
+            window.location.href = '/user/'+$th.text()
+        });
+    </script>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#GruppeModal" data-bs-whatever="@mdo">Hinzufügen +</button>
+    </div>
+
+
+    <!--Gruppenrechte-->
+
+      <div class="col p-3">
+        <h4 class="text-light">Zugriff auf:</h4>
+        <table class="table table-hover table-light">
+          {%for location in locations%}
+          <tr>
+            <th scope="row" style="display:none">{{ location.id }}</th>
+            <td>{{location.name}}</td>
+          </tr>
+          {%endfor%}
+        </table>
+      </div>
+
+
+    </div>
+  </div>
+
+{% endblock %}

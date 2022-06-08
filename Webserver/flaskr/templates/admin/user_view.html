@@ -1,0 +1,72 @@
+{% extends 'base.html' %} {% block content %}
+
+
+  <h4 class="text-light">{{user.name}}</h4>
+  <div class="container">
+    <div class="row">
+    <!--Nutzerdaten-->
+      <div class="col p-3">
+        <h4 class="text-light">Nutzerdaten</h4>
+        <form action="{{ url_for('rfid.user_create') }}" method="POST">
+            <input type="text" class="form-control" id="user-id" name="user-id" style="display:none" value="{{user.id}}"></input>
+            <label for="user-name" class="col-form-label text-white">Name:</label>
+            <input type="text" class="form-control" id="user-name" name="user-name" value="{{user.name}}">
+            <label for="user-transponder_id" class="col-form-label text-white">Transponder ID:</label>
+            <input type="text" class="form-control" id="user-tranponder_id" name="user-tranponder_id" value="{{user.transponder_id}}">
+            <button type="submit" class="btn btn-primary mt-2">Update</button>
+        </form>
+      </div>
+
+    <!--Nutzergruppen-->
+    <div class="col-md-4 p-3">
+      <h4 class="text-light">Gruppen</h4>
+      <table class="table table-hover table-light" id='table_user_gruppen'>
+
+        {%for gruppe in gruppen%}
+        <tr>
+          <th scope="row" style="display:none">{{ gruppe.id }}</th>
+          {% if gruppe.user_id %}
+          <td style="color:green">{{gruppe.name}}</td>
+          {%else%}
+          <td>{{gruppe.name}}</td>
+          {%endif%}
+        </tr>
+        {%endfor%}
+      </table>
+      <script>
+        $('#table_user_gruppen').on('click', 'tbody td', function () {
+            var $row = $(this).closest('tr'),
+            $th = $row.find('th');
+            window.location.href = '/gruppe/'+$th.text()
+        });
+    </script>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#GruppeModal" data-bs-whatever="@mdo">Hinzufügen +</button>
+    </div>
+
+
+    <!--Nutzerrechte-->
+
+      <div class="col p-3">
+        <h4 class="text-light">Zugriff auf</h4>
+        <table class="table table-hover table-light" id="location_table">
+          {%for location in locations%}
+          <tr>
+            <th scope="row" style="display:none">{{ location.id }}</th>
+            <td>{{location.name}}</td>
+          </tr>
+          {%endfor%}
+        </table>
+        <script>
+          $('#location_table').on('click', 'tbody td', function () {
+              var $row = $(this).closest('tr'),
+              $th = $row.find('th');
+              window.location.href = '/location/'+$th.text()
+          });
+      </script>
+      </div>
+
+
+    </div>
+  </div>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %} {% block content %}
+
+    <!-- location -->
+
+      <h4 class="text-light">Orte</h4>
+      <table class="table table-hover table-light" id='location_table'>
+        <thead>
+          <tr>
+            <th scope="col" style="display:none">ID</th>
+            <th scope="col">Locations</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        {%for location in locations%}
+        <tr>
+          <th scope="row" style="display:none">{{location.id}}</th>
+          <td>{{location.fancy_name}}</td>
+          <td>
+            <a href="{{['/location', location.id,'delete']|join('/')}}" class="delete" data-toggle="modal"><i class="fa fa-trash-o" data-toggle="tooltip" title="Delete"></i></a>
+        </td>
+        </tr>
+        {%endfor%}
+      </table>
+      <script>
+        $('#location_table').on('click', 'tbody td', function () {
+            var $row = $(this).closest('tr'),
+            $th = $row.find('th');
+            window.location.href = '/location/'+$th.text()
+        });
+    </script>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#LocationModal" data-bs-whatever="@mdo">Hinzufügen +</button>
+
+      <div class="modal fade" id="LocationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Location</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form action="{{ url_for('admin.location_create') }}" method="POST">
+                <div class="mb-3">
+                  <label for="location-name" class="col-form-label">Name:</label>
+                  <input type="text" class="form-control" id="location-name" name="location-name">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="submit" class="btn btn-primary">Speichern</button>
+              </div>
+            </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %} {% block content %}
+
+    <h4 class="text-light">Nutzer</h4>
+    <table class="table table-hover table-light" id="user_table">
+      <thead>
+        <tr>
+          <th scope="col" style="display:none">ID</th>
+          <th scope="col">Nutzername</th>
+          <th scope="col">Transponder ID</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      {%for user in users%}
+      <tr>
+        <th scope="row" style="display:none">{{user.id}}</th>
+        <td>{{user.name}}</td>
+        <td>{{user.transponder_id}}</td>
+        <td>
+          <a href="{{['/user', user.id,'delete']|join('/')}}" class="delete" data-toggle="modal"><i class="fa fa-trash-o" data-toggle="tooltip" title="Delete"></i></a>
+        </td>
+      </tr>
+      {%endfor%}
+
+    </table>
+    <script>
+        $('#user_table').on('click', 'tbody td', function () {
+            var $row = $(this).closest('tr'),
+            $th = $row.find('th');
+            window.location.href = '/user/'+$th.text()
+        });
+    </script>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#UserModal" data-bs-whatever="@mdo">Hinzufügen +</button>
+
+
+<!-- Modal User-->
+<div class="modal fade" id="UserModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('admin.user_create') }}" method="POST">
+          <div class="mb-3">
+            <label for="user-name" class="col-form-label">Name:</label>
+            <input type="text" class="form-control" id="user-name" name="user-name">
+          </div>
+          <div class="mb-3">
+            <label for="user-TransponderID" class="col-form-label">Trasnponder ID:</label>
+            <input type="text" class="form-control" id="user-TransponderID" name="user-TransponderID"></input>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+          <button type="submit" class="btn btn-primary">Speichern</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
