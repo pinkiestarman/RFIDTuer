@@ -1,12 +1,16 @@
 # imports
-from distutils.util import execute
 import sys
-import time
 import threading
+import time
 import traceback
-import RPi.GPIO as GPIO
+from distutils.util import execute
+from numbers import Integral
+from datetime import datetime
+
 import mariadb
+import RPi.GPIO as GPIO
 from mfrc522 import SimpleMFRC522
+from typing_extensions import Self
 
 ClientID = 1
 
@@ -153,6 +157,7 @@ class db():
             'INSERT INTO user_gruppe(user_id, gruppe_id) VALUES (?,?)', (
                 user_id, gruppe_id,)
         )
+        
         self.conn.commit()
         cur.close()
         return 0
@@ -169,16 +174,24 @@ class db():
         self.conn.commit()
         return 0
 
-    def get_user(self, id):
+    def get_user(self, id: Integral):
         cur = self.conn.cursor()
         cur.execute(
             'SELECT * FROM user WHERE user.transponder_id=?', (id,))
         return self.cursor_to_dict_array(cur)
 
-    def get_gruppe(self, name):
+    def get_gruppe(self, name: str):
         cur = self.conn.cursor()
         cur.execute('SELECT * FROM gruppe WHERE gruppe.name=?', (name,))
         return self.cursor_to_dict_array(cur)
+
+    def write_log(self, user: int, objekt: int, description: str) -> None:
+        now = datetime.now()
+        cur = self.conn.cursor()
+        cur.execute(
+            "INSERT INTO logs (timestamp, user_id, objekt_id, description) VALUES (?,?,?, ?)",
+            now, user, objekt, description
+        )
 
 
 def main():
@@ -214,7 +227,7 @@ def main():
 
                     if(len(user) > 0):
                         led.red()
-                        print(f'Tranponder id: {id} already in use!')
+                        print(f'Transponder id: {id} already in use!')
                     else:
                         if(database.create_user(id) == 0):
                             led.green()
@@ -242,12 +255,10 @@ def main():
 
                 else:
                     # Check Access
-                    if(acces_granted != True):
-                        acces_granted = database.check_acces_right(id)
-
-                    if (acces_granted):
+                    if(database.check_acces_right(id)):
                         print('Acces Granted!')
                         led.blinkin(led.green, blinkinDelay=0.2)
+                        write_log()
                     else:
                         print('Acces Denied!')
                         led.red()
