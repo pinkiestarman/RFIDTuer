@@ -1,6 +1,6 @@
 
 from flask import Blueprint, flash, redirect, request, url_for
-from SQL.db import db_commit, get_cursor, get_db
+from flaskr.SQL.db import db_commit, get_cursor, get_db
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
@@ -21,7 +21,7 @@ def user_create():
              'pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254',),
         )
         db_commit()
-        log_create_user(username,transponderID)
+        #log_create_user(username, transponderID)
     return redirect(url_for('admin.index'))
 
 

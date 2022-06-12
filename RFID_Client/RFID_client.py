@@ -157,7 +157,7 @@ class db():
             'INSERT INTO user_gruppe(user_id, gruppe_id) VALUES (?,?)', (
                 user_id, gruppe_id,)
         )
-        
+
         self.conn.commit()
         cur.close()
         return 0
@@ -203,76 +203,68 @@ def main():
     while(True):
         # Init
         acces_granted = False
-        try:
-            print('Check connection to database...')
-            if(database.connect() != 0):
-                print('Database connection failed, retry in 10 sec')
-                led.blinkin(led.red)
-                time.sleep(10)
-            else:
-                print('Database connection established!')
-            # Read RFID Chip
-            id, text = reader.read()
+        print('Check connection to database...')
+        if(database.connect() != 0):
+            print('Database connection failed, retry in 10 sec')
+            led.blinkin(led.red)
+            time.sleep(10)
+        else:
+            print('Database connection established!')
+        # Read RFID Chip
+        id, text = reader.read()
 
-            # Check special flags
-            flag = database.check_special_flag(id)
-            print(f'Management Code: {flag}')
-            if(flag is not None):
-                if(flag == 1):  # Add User
-                    led.blinkin(led.yellow, blinkinDelay=0.2)
-                    print('Adding new user...')
-                    time.sleep(1)
-                    id, text = reader.read()
-                    user = database.get_user(id)
+        # Check special flags
+        flag = database.check_special_flag(id)
+        print(f'Management Code: {flag}')
+        if(flag is not None):
+            if(flag == 1):  # Add User
+                led.blinkin(led.yellow, blinkinDelay=0.2)
+                print('Adding new user...')
+                time.sleep(1)
+                id, text = reader.read()
+                user = database.get_user(id)
 
-                    if(len(user) > 0):
-                        led.red()
-                        print(f'Transponder id: {id} already in use!')
-                    else:
-                        if(database.create_user(id) == 0):
-                            led.green()
-                            print(f'Succesfully created new user! id: {id}')
-                        else:
-                            led.red()
-                            print(f'Error while creating user! id: {id}')
-                elif(flag == 2):  # Give acces
-                    led.blinkin(led.blue, blinkinDelay=0.2)
-                    print('Adding new access right...')
-                    time.sleep(1)
-                    id, text = reader.read()
-                    if(database.check_acces_right(id)):
-                        led.green()
-                        print('Transponder id: {id} has already access!')
-                    else:
-                        user = database.get_user(id)
-                        if(len(user) > 0):
-                            database.create_right(id)
-                            led.green()
-                            print('Succesfully added access right to user!')
-                        else:  # User existiert nicht
-                            led.red()
-                            print(f'No user found for id: {id}')
-
+                if(len(user) > 0):
+                    led.red()
+                    print(f'Transponder id: {id} already in use!')
                 else:
-                    # Check Access
-                    if(database.check_acces_right(id)):
-                        print('Acces Granted!')
-                        led.blinkin(led.green, blinkinDelay=0.2)
-                        write_log()
+                    if(database.create_user(id) == 0):
+                        led.green()
+                        print(f'Succesfully created new user! id: {id}')
                     else:
-                        print('Acces Denied!')
                         led.red()
+                        print(f'Error while creating user! id: {id}')
+            elif(flag == 2):  # Give acces
+                led.blinkin(led.blue, blinkinDelay=0.2)
+                print('Adding new access right...')
+                time.sleep(1)
+                id, text = reader.read()
+                if(database.check_acces_right(id)):
+                    led.green()
+                    print('Transponder id: {id} has already access!')
+                else:
+                    user = database.get_user(id)
+                    if(len(user) > 0):
+                        database.create_right(id)
+                        led.green()
+                        print('Succesfully added access right to user!')
+                    else:  # User existiert nicht
+                        led.red()
+                        print(f'No user found for id: {id}')
+
             else:
-                print('Data spaghetti')
-        except mariadb.Error as err:
-            print(f'Datenbank fehler: {err}')
-            led.blinkin(led.red)
-        except BaseException as err:
-            led.blinkin(led.red)
-            print(f'Error? {err}')
-        finally:
-            time.sleep(3)
-            led.blue()
+                # Check Access
+                if(database.check_acces_right(id)):
+                    print('Acces Granted!')
+                    led.blinkin(led.green, blinkinDelay=0.2)
+                    database.write_log()
+                else:
+                    print('Acces Denied!')
+                    led.red()
+        else:
+            print('Data spaghetti')
+        time.sleep(3)
+        led.blue()
 
 
 if __name__ == '__main__':
@@ -280,6 +272,8 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt:
         GPIO.cleanup()
-    except Exception:
-        traceback.print_exc(file=sys.stdout)
+    except mariadb.Error as err:
+        print(f'Datenbank fehler: {err}')
+    except BaseException as err:
+        print(f'Error? {err}')
     sys.exit(0)

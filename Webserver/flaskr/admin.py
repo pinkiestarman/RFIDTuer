@@ -9,7 +9,7 @@ from flaskr import db
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
-from flaskr.db import cursor_to_dict_array, get_cursor, db_commit
+from flaskr.SQL.db import cursor_to_dict_array, get_cursor, db_commit
 
 bp = Blueprint("admin", __name__)
 
