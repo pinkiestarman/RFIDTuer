@@ -5,7 +5,6 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
-from flaskr import db
 from werkzeug.exceptions import abort
 
 from flaskr.auth import login_required
@@ -72,16 +71,17 @@ def location():
     cur = get_cursor()
     cur.execute(
         "WITH RECURSIVE cte as ("
-        " SELECT id, name, parent_id, client_id, 0 as Level, name as fancy_name"
+        " SELECT id, name, parent_id, client_id, 0 as Level, name as fancy_name, name as sort"
         " FROM location"
         " WHERE parent_id IS NULL"
         " UNION ALL"
-        " SELECT l.id, l.name, l.parent_id, l.client_id, Level + 1 as Level, Concat(REPEAT('--- ', Level + 1),l.name) as fancy_name"
+        " SELECT l.id, l.name, l.parent_id, l.client_id, Level + 1 as Level, Concat(REPEAT('____', Level + 1),l.name) as fancy_name, Concat(sort,' : ',l.name) as sort"
         " FROM location l"
         " INNER JOIN cte"
         " ON l.parent_id=cte.id"
         ")"
-        "SELECT * FROM cte"
+        " SELECT * FROM cte"
+        " ORDER BY sort"
     )
     locations = cursor_to_dict_array(cur)
     print(locations)

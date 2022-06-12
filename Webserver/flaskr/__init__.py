@@ -1,5 +1,4 @@
 import os
-
 from flask import Flask
 
 
@@ -25,15 +24,6 @@ def create_app(test_config=None):
         os.makedirs(app.instance_path)
     except OSError:
         pass
-
-    @app.route("/hello")
-    def hello():
-        return "Hello, World!"
-
-    # register the database commands
-    from flaskr import db
-
-    db.init_app(app)
 
     # apply the blueprints to the app
     from flaskr import auth, admin, rfid
