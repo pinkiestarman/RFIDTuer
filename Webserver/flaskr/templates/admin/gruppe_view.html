@@ -6,7 +6,7 @@
     <div class="row">
     <!--Nutzerdaten-->
       <div class="col p-3">
-        <h4 class="text-light">Gruppendaten:</h4>
+        <h4 class="text-light">Gruppendaten</h4>
         <form action="{{ url_for('admin.gruppe_create') }}" method="POST">
             <input type="text" class="form-control" id="user-id" name="user-id" style="display:none" value="{{gruppe.id}}"></input>
             <label for="user-name" class="col-form-label text-white">Name:</label>
@@ -17,7 +17,7 @@
 
     <!--Nutzer-->
     <div class="col-md-4 p-3">
-      <h4 class="text-light">Nutzer in Gruppe:</h4>
+      <h4 class="text-light">Nutzer in Gruppe</h4>
       <table class="table table-hover table-light" id='table_gruppen_user'>
 
         {%for user in users%}
@@ -41,7 +41,7 @@
     <!--Gruppenrechte-->
 
       <div class="col p-3">
-        <h4 class="text-light">Zugriff auf:</h4>
+        <h4 class="text-light">Zugriff auf</h4>
         <table class="table table-hover table-light" id="location_table">
 
           {%for location in locations%}

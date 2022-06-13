@@ -1,4 +1,5 @@
 {% extends 'base.html' %} {% block content %}
+<div id="location_id" style="display:none">{{location.id}}</div>
 
 
   <h4 class="text-light">{{location.name}}</h4>
@@ -6,7 +7,7 @@
     <div class="row">
     <!--Nutzerdaten-->
       <div class="col p-3">
-        <h4 class="text-light">Ortsdaten:</h4>
+        <h4 class="text-light">Ortsdaten</h4>
         <form action="{{ url_for('admin.location_create') }}" method="POST">
             <input type="text" class="form-control" id="user-id" name="user-id" style="display:none" value="{{location.id}}"></input>
             <label for="user-name" class="col-form-label text-white">Name:</label>
@@ -15,43 +16,95 @@
         </form>
       </div>
 
+    {%if not location.client_id%}
     <!--Childs-->
     <div class="col-md-4 p-3">
-      <h4 class="text-light"></h4>
-      <table class="table table-hover table-light" id='table_gruppen_user'>
-        {%for user in users%}
+      <h4 class="text-light">Kinder</h4>
+      <table class="table table-hover table-light" id='table_location'>
+        {%for location in locations%}
         <tr>
-          <th scope="row" style="display:none">{{ user.id }}</th>
-          <td>{{user.name}}</td>
+          <th scope="row" style="display:none">{{ location.id }}</th>
+          <td>{{location.name}}</td>
         </tr>
         {%endfor%}
       </table>
       <script>
-        $('#table_gruppen_user').on('click', 'tbody td', function () {
+        $('#table_location').on('click', 'tbody td', function () {
             var $row = $(this).closest('tr'),
             $th = $row.find('th');
-            window.location.href = '/user/'+$th.text()
+            window.location.href = '/location/'+$th.text()
         });
     </script>
-      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#GruppeModal" data-bs-whatever="@mdo">Hinzufügen +</button>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#LocationModal" data-bs-whatever="@mdo">Hinzufügen +</button>
     </div>
+    {%endif%}
 
-
-    <!--Gruppenrechte-->
+    <!--Gruppen mit Zugriff-->
 
       <div class="col p-3">
-        <h4 class="text-light">Zugriff auf:</h4>
-        <table class="table table-hover table-light">
-          {%for location in locations%}
+        <h4 class="text-light">Gruppen/Nutzer mit Zugriff</h4>
+        <table class="table table-hover table-light" id="table_gruppe">
+          {%for gruppe in gruppen%}
           <tr>
-            <th scope="row" style="display:none">{{ location.id }}</th>
-            <td>{{location.name}}</td>
+            <th scope="row" style="display:none">{{ gruppe.id }}</th>
+            <th scope="row" style="display:none"></th>
+            {% if gruppe.user_id %}
+            <td style="color:green">{{gruppe.name}}</td>
+            {%else%}
+            <td id='gruppen_name'>{{gruppe.name}}</td>
+            {%endif%}
+            <td>
+                <i class="fa fa-trash-o" data-toggle="tooltip" title="recht entfernen" id="recht_entfernen"></i>
+            </td>
           </tr>
           {%endfor%}
         </table>
+        <script>
+          $('#table_gruppe').on('click', 'tbody #gruppen_name', function () {
+              var $row = $(this).closest('tr'),
+              $th = $row.find('th');
+              window.location.href = '/gruppe/'+$th.text()
+          });
+          $('#recht_entfernen').on('click', function(){
+              var $row = $(this).closest('tr'),
+              $th = $row.find('th');
+              var $gruppe_id = $th.text();
+              var $location_id = $('#location_id').text();
+              $.ajax("/recht/delete", {
+                data : JSON.stringify({ 'gruppe_id': $gruppe_id, 'location_id': $location_id}),
+                contentType : 'application/json',
+                type : 'POST'
+              });
+          });
+      </script>
       </div>
 
 
+    </div>
+  </div>
+
+  <div class="modal fade" id="LocationModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Location</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="{{ url_for('admin.location_create') }}" method="POST">
+            <div class="mb-3">
+              <label for="location-name" class="col-form-label">Name:</label>
+              <input type="text" class="form-control" id="location-name" name="location-name">
+              <input type="text" class="form-control" id="location-parent-id" name="location-parent-id" value="{{location.id}}" style="display:none">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+            <button type="submit" class="btn btn-primary">Speichern</button>
+          </div>
+        </form>
+        </div>
+      </div>
     </div>
   </div>
 

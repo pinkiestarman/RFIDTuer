@@ -1,3 +1,5 @@
+import json
+from lib2to3.pytree import Base
 from flask import Blueprint
 from flask import flash
 from flask import g
@@ -51,7 +53,6 @@ def index():
         "SELECT recht.id, location.name as location_name from recht JOIN location ON recht.objekt_id=location.id ORDER BY recht.id ASC"
     )
     rechte = cursor_to_dict_array(cur)
-    print(rechte)
     cur.close()
 
     return render_template("admin/index.html", gruppen=gruppen, users=users, locations=locations, rechte=rechte)
@@ -84,7 +85,6 @@ def location():
         " ORDER BY sort"
     )
     locations = cursor_to_dict_array(cur)
-    print(locations)
     cur.close()
 
     return render_template("admin/location.html", locations=locations)
@@ -102,9 +102,16 @@ def location_create():
     if 'location-name' in request.form:
         location = request.form['location-name']
         cur = get_cursor()
-        cur.execute('INSERT INTO location (name) VALUES (?)', (location,))
-        db_commit()
-    return redirect(url_for('admin.location'))
+        if 'location-parent-id' in request.form:
+            parentid = request.form['location-parent-id']
+            cur.execute('INSERT INTO location (name, parent_id) VALUES (?,?)',
+                        (location, parentid,))
+            db_commit()
+            return redirect('/location/'+str(parentid))
+        else:
+            cur.execute('INSERT INTO location (name) VALUES (?)', (location,))
+            db_commit()
+            return redirect(url_for('admin.location'))
 
 
 @bp.route('/location/<int:id>/delete', methods=['GET'])
@@ -134,8 +141,18 @@ def location_view(id):
     cur = get_cursor()
     cur.execute('SELECT * FROM location WHERE id=?', (id,))
     location = cursor_to_dict_array(cur)
-    db_commit()
-    return render_template('/admin/location_view.html', location=location[0])
+
+    cur.execute('SELECT * FROM location WHERE parent_id=?', (id,))
+    locations = cursor_to_dict_array(cur)
+
+    cur.execute("SELECT gruppe.id, gruppe.name, gruppe.user_id FROM gruppe"
+                " JOIN gruppe_recht ON gruppe.id=gruppe_recht.gruppe_id"
+                " JOIN recht ON gruppe_recht.recht_id=recht.id"
+                " JOIN location ON recht.objekt_id=location.id"
+                " WHERE location.id=?", (id,))
+    gruppen = cursor_to_dict_array(cur)
+
+    return render_template('/admin/location_view.html', location=location[0], locations=locations, gruppen=gruppen)
 
 # Actions for Table 'gruppe'
 
@@ -224,7 +241,6 @@ def gruppe_view(id):
         " WHERE gruppe.id=?", (id,)
     )
     users = cursor_to_dict_array(cur)
-    print(users)
     cur.execute(
         " SELECT location.id, location.name"
         " FROM user"
@@ -315,7 +331,6 @@ def user_view(id):
     )
 
     locations = cursor_to_dict_array(cur)
-    print(locations)
     cur.close()
 
     return render_template("admin/user_view.html", user=user[0], gruppen=gruppen, locations=locations)
@@ -370,3 +385,24 @@ def user_update(id):
     cur = get_cursor()
 
     return redirect(url_for('admin.index'))
+
+# Rechte
+
+
+@bp.route('/recht/delete', methods=['POST'])
+@login_required
+def recht_delete():
+    if (g.user is None):
+        abort(403)
+
+    if(g.user['admin_flag'] != 1):
+        return abort(403)
+
+    data = request.json
+
+    cur = get_cursor()
+    cur.execute(
+        'DELETE FROM gruppe_recht WHERE gruppe_recht.id=(SELECT gr.id FROM (SELECT * FROM gruppe_recht) as gr JOIN recht ON gr.recht_id=recht.id WHERE recht.objekt_id=? AND gr.gruppe_id=?)', (data['location_id'], data['gruppe_id']))
+    db_commit()
+
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
