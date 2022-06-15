@@ -43,7 +43,7 @@
 
       <div class="col p-3">
         <h4 class="text-light">Gruppen/Nutzer mit Zugriff</h4>
-        <table class="table table-hover table-light" id="table_gruppe">
+        <table class="table table-hover table-light table-bordered" id="table_gruppe">
           {%for gruppe in gruppen%}
           <tr>
             <th scope="row" style="display:none">{{ gruppe.id }}</th>
@@ -54,7 +54,9 @@
             <td id='gruppen_name'>{{gruppe.name}}</td>
             {%endif%}
             <td>
+              <div class="d-flex align-items-center justify-content-center">
                 <i class="fa fa-trash-o" data-toggle="tooltip" title="recht entfernen" id="recht_entfernen"></i>
+              </div>
             </td>
           </tr>
           {%endfor%}
@@ -75,11 +77,25 @@
                 contentType : 'application/json',
                 type : 'POST'
               });
+              window.location.reload(true);
           });
       </script>
+      <button type="button" class="btn btn-success" id="add_recht">Hinzufügen +</button>
+      <script>
+        $('#add_recht').on('click', function() {
+          var $location_id = $('#location_id').text();
+          $.ajax("/gruppen_no_right", {
+            data : $location_id,
+            contentType : 'application/json',
+            type : 'POST',
+            success: function(data){
+              var json = $.parseJSON(data);
+              alert(json.html);
+           }
+          });
+        });
+      </script>
       </div>
-
-
     </div>
   </div>
 

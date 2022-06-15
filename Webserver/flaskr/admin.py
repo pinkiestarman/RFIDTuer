@@ -178,6 +178,39 @@ def gruppe():
     return render_template("admin/gruppe.html", gruppen=gruppen)
 
 
+@bp.route("/gruppen_no_right", methods=("POST",))
+@login_required
+def gruppen_no_right():
+    if (g.user is None):
+        abort(403)
+
+    if(g.user['admin_flag'] != 1):
+        return abort(403)
+
+    data = request.json
+
+    cur = get_cursor()
+
+    cur.execute(
+        "SELECT *"
+        " FROM gruppe"
+        " WHERE id not in"
+        " (SELECT gruppe.id"
+        " FROM gruppe"
+        " JOIN gruppe_recht"
+        " ON gruppe.id=gruppe_recht.gruppe_id"
+        " JOIN recht"
+        " ON gruppe_recht.recht_id=recht.id"
+        " JOIN location"
+        " ON recht.objekt_id=location.id"
+        " WHERE location.id=?)", (data,)
+    )
+    gruppen = cursor_to_dict_array(cur)
+    print(gruppen)
+    cur.close()
+    return json.dumps({'data': gruppen}), 200, {'ContentType': 'application/json'}
+
+
 @bp.route('/gruppe/create', methods=['POST'])
 @login_required
 def gruppe_create():

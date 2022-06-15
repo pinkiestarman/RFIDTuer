@@ -1,0 +1,17 @@
+start LED thread
+turn LED blue
+
+while TRUE:
+    try:
+        wait for chip to be read
+        connect to database
+        check access in database
+        if acces granted:
+            turn led green
+        else:
+            turn led red
+    except database error:
+        turn LED blinkin RED
+    finally:
+        sleep for 3 seconds
+        turn LED blue

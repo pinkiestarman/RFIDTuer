@@ -1,0 +1,20 @@
+id	name	vorname	transponder_id	passwort_hash	admin_flag	management_code
+1	admin	NULL	NULL	pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254	1	0
+2	Doorian (Chip Standard User)	NULL	882784646626	pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254	0	0
+3	CREATE NEW USER (Card)	NULL	1050655679228	pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254	0	1
+4	CREATE NEW RIGHT (Card)	NULL	706167923279	pbkdf2:sha256:260000$ClAB2AQV4Jzr8zv8$61cd04ff86bb8a46a7e1fc5caa40ab5be15aca8407227693f50c730cd87c1254	0	2
+id	parent_id	name	client_id
+1	5	Lehrerzimmer ID 1	NULL
+2	1	Tür ID 2	1
+3	5	Küche ID 3	NULL
+4	3	Tür ID 4	2
+5	NULL	Schulgebäude ID 5	NULL
+id	name	user_id
+1	Lehrer	NULL
+2	admin	1
+3	Doorian (Chip Standard User)	2
+4	CREATE NEW USER (Card)	3
+5	CREATE NEW RIGHT (Card)	4
+id	zeit_von	zeit_bis	objekt_id
+1	NULL	NULL	2
+2	NULL	NULL	5

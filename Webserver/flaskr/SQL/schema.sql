@@ -27,6 +27,7 @@ DROP TABLE IF EXISTS location;
 CREATE TABLE `user` (
     id INT NOT NULL AUTO_INCREMENT,
     `name` TEXT(70) NOT NULL,
+    `vorname` TEXT(70),
     `transponder_id` BIGINT UNIQUE,
     `passwort_hash` TEXT NOT NULL,
     `admin_flag` BOOLEAN DEFAULT 0,
@@ -45,7 +46,7 @@ CREATE TABLE `user` (
 CREATE TABLE `location` (
     id INT NOT NULL AUTO_INCREMENT,
     `parent_id` INT,
-    `name` TEXT,
+    `name` TEXT(70),
     `client_id` INT,
     PRIMARY KEY(id),
     FOREIGN KEY (parent_id) REFERENCES location(id) ON DELETE CASCADE
@@ -196,7 +197,7 @@ CREATE USER 'verwalter'@'%' IDENTIFIED BY '123';
 
 FLUSH PRIVILEGES;
 
-GRANT SELECT, INSERT, UPDATE ON RFID.* TO 'verwalter' @'%';
+GRANT SELECT, INSERT, UPDATE, DELETE ON RFID.* TO 'verwalter' @'%';
 
 FLUSH PRIVILEGES;
 
