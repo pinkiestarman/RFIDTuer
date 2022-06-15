@@ -1,4 +1,5 @@
 # imports
+from asyncore import write
 import sys
 import threading
 import time
@@ -159,19 +160,22 @@ class db():
         )
 
         self.conn.commit()
+        self.write_log(user=id, description=f"User {username} Created")
         cur.close()
         return 0
 
     def create_right(self, id):
         cur = self.conn.cursor()
         user = self.get_user(id)
-        gruppe = self.get_gruppe(user[0]['name'])
+        username = user[0]['name']
+        gruppe = self.get_gruppe(username)
         cur.execute(
             'INSERT INTO recht(objekt_id) SELECT location.id from location WHERE location.client_id=?', (ClientID,)
         )
         cur.execute('INSERT INTO gruppe_recht (recht_id, gruppe_id) VALUES (?,?)',
                     (cur.lastrowid, gruppe[0]['id']))
         self.conn.commit()
+        self.write_log(user=id, description=f"Right created for {username}")
         return 0
 
     def get_user(self, id: Integral):
@@ -185,13 +189,11 @@ class db():
         cur.execute('SELECT * FROM gruppe WHERE gruppe.name=?', (name,))
         return self.cursor_to_dict_array(cur)
 
-    def write_log(self, user: int, objekt: int, description: str) -> None:
+    def write_log(self, user: int=None, description: str=None) -> None:
         now = datetime.now()
         cur = self.conn.cursor()
-        cur.execute(
-            "INSERT INTO logs (timestamp, user_id, objekt_id, description) VALUES (?,?,?, ?)",
-            now, user, objekt, description
-        )
+        cur.execute('INSERT INTO logs(timestamp, user_id, objekt_id, description) VALUES (?,?,?, ?)',
+                    ( now, user, ClientID, description ))
 
 
 def main():
@@ -256,11 +258,15 @@ def main():
                 else:
                     # Check Access (Hier endet der Teil der nicht representiert ist)
                     if(database.check_acces_right(id)):
-                        print('Acces Granted!')
+                        msg='Acces Granted!'
+                        database.write_log(user=id, description=msg)
+                        print(msg)
                         led.blinkin(led.green, blinkinDelay=0.2)
                         database.write_log()
                     else:
-                        print('Acces Denied!')
+                        msg='Acces Denied!'
+                        database.write_log(user=id, description=msg)
+                        print(msg)
                         led.red()
                         database.write_log()
             else:
